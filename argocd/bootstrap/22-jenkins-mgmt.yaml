@@ -1,0 +1,43 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: jenkins-management
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: default
+  sources:
+    # Source 1: Official Jenkins Helm Chart
+    - repoURL: https://charts.jenkins.io
+      chart: jenkins
+      targetRevision: 5.1.20 # Phiên bản chart mới
+      helm:
+        valueFiles:
+          - $values/jenkins/jenkins-values.yaml
+    
+    # Source 2: Cấu hình values ở repo go-micro của bạn
+    - repoURL: https://github.com/minhtri1612/go-micro.git
+      targetRevision: main
+      ref: values
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: jenkins
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+
+  # Jenkins Secret đổi sau runtime → Argo báo OutOfSync nếu không bỏ qua drift /data.
+  # Sau khi sửa block này: kubectl apply -f argocd/bootstrap/22-jenkins-mgmt.yaml rồi Refresh/Hard refresh app trên Argo.
+  ignoreDifferences:
+    - group: ""
+      kind: Secret
+      name: jenkins-management
+      namespace: jenkins
+      jsonPointers:
+        - /data

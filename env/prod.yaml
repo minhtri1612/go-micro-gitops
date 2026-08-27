@@ -1,0 +1,77 @@
+env: prod
+
+# Service-specific overrides
+
+product:
+  image:
+    tag: "product-service-v1.0.3"
+  replicaCount: 3
+  rollout:
+    enabled: true
+    strategy: canary
+
+inventory:
+  image:
+    tag: "inventory-service-v1.0.3"
+  replicaCount: 3
+  rollout:
+    enabled: true
+    strategy: canary
+
+order:
+  image:
+    tag: "order-service-v1.0.3"
+  replicaCount: 5
+  rollout:
+    enabled: true
+    strategy: canary
+
+payment:
+  image:
+    tag: "payment-service-v1.0.3"
+  replicaCount: 5
+  rollout:
+    enabled: true
+    strategy: canary
+
+noti:
+  image:
+    tag: "notification-service-v1.0.3"
+  replicaCount: 3
+  rollout:
+    enabled: true
+    strategy: canary
+
+client:
+  image:
+    tag: "client-v1.0.3"
+  replicaCount: 3
+  rollout:
+    enabled: true
+    strategy: canary
+
+# Database services
+product-db:
+  image:
+    tag: "15-alpine"
+  replicaCount: 1
+
+inventory-db:
+  image:
+    tag: "15-alpine"
+  replicaCount: 1
+
+order-db:
+  image:
+    tag: "15-alpine"
+  replicaCount: 1
+
+payment-db:
+  image:
+    tag: "15-alpine"
+  replicaCount: 1
+
+notification-db:
+  image:
+    tag: "15-alpine"
+  replicaCount: 1

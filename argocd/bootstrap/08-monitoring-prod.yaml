@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: monitoring-prod
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: prod
+  sources:
+    - repoURL: https://prometheus-community.github.io/helm-charts
+      chart: kube-prometheus-stack
+      targetRevision: 61.3.2
+      helm:
+        valueFiles:
+          - $values/monitoring/monitoring-workload.yaml
+          - $values/monitoring/monitoring-workload-labels-prod.yaml
+    - repoURL: https://github.com/minhtri1612/go-micro.git
+      targetRevision: main
+      ref: values
+    - repoURL: https://github.com/minhtri1612/go-micro.git
+      targetRevision: main
+      path: monitoring
+      directory:
+        include: "prometheus-global-workload.yaml"
+  destination:
+    name: prod
+    namespace: monitoring
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

@@ -1,0 +1,60 @@
+{{- $wk := .Values.workloadKind | default "deployment" | lower }}
+{{- $cs := .Values.currentService | default "" }}
+{{- $svc := (index .Values $cs) | default dict }}
+{{- $backend := .Values.backend | default dict }}
+{{- $rolloutCfg := deepCopy (.Values.rollout | default dict) }}
+{{- if and (not (hasSuffix "-db" $cs)) (hasKey $backend "rollout") }}
+{{- $rolloutCfg = mergeOverwrite $rolloutCfg ($backend.rollout | default dict) }}
+{{- end }}
+{{- if hasKey $svc "rollout" }}
+{{- $rolloutCfg = mergeOverwrite $rolloutCfg ($svc.rollout | default dict) }}
+{{- end }}
+{{- if and (ne $wk "statefulset") ($rolloutCfg.enabled | default false) }}
+{{- $strategy := $rolloutCfg.strategy | default "canary" | lower }}
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: {{ include "template.fullname" . }}
+  labels:
+    {{- include "template.labels" . | nindent 4 }}
+spec:
+  replicas: {{ $svc.replicaCount | default .Values.replicaCount }}
+  revisionHistoryLimit: {{ .Values.rollout.revisionHistoryLimit | default 3 }}
+  selector:
+    matchLabels:
+      {{- include "template.selectorLabels" . | nindent 6 }}
+  strategy:
+    {{- if eq $strategy "bluegreen" }}
+{{- $bg := $rolloutCfg.blueGreen | default dict }}
+{{- $autoProm := index $bg "autoPromotionEnabled" }}
+{{- $scaleDown := index $bg "scaleDownDelaySeconds" }}
+    blueGreen:
+      activeService: {{ $rolloutCfg.blueGreen.activeService | default (include "template.fullname" .) }}
+      previewService: {{ $rolloutCfg.blueGreen.previewService | default (printf "%s-preview" (include "template.fullname" .) ) }}
+      autoPromotionEnabled: {{ if kindIs "bool" $autoProm }}{{ $autoProm }}{{ else }}true{{ end }}
+      scaleDownDelaySeconds: {{ if kindIs "float64" $scaleDown }}{{ int $scaleDown }}{{ else if kindIs "int64" $scaleDown }}{{ $scaleDown }}{{ else if kindIs "int" $scaleDown }}{{ $scaleDown }}{{ else }}30{{ end }}
+      {{- if $rolloutCfg.blueGreen.prePromotionAnalysis }}
+      prePromotionAnalysis:
+        {{- tpl (toYaml $rolloutCfg.blueGreen.prePromotionAnalysis) . | nindent 8 }}
+      {{- end }}
+    {{- else }}
+    {{- $stableSvc := $rolloutCfg.canary.stableService | default (include "template.fullname" .) }}
+    {{- $canarySvc := $rolloutCfg.canary.canaryService | default (printf "%s-canary" (include "template.fullname" .)) }}
+    canary:
+      stableService: {{ $stableSvc }}
+      canaryService: {{ $canarySvc }}
+      trafficRouting:
+        traefik:
+          weightedTraefikServiceName: {{ include "template.fullname" . }}-weighted
+      {{- with $rolloutCfg.canary.maxSurge }}
+      maxSurge: {{ . }}
+      {{- end }}
+      {{- with $rolloutCfg.canary.maxUnavailable }}
+      maxUnavailable: {{ . }}
+      {{- end }}
+      steps:
+        {{- tpl (toYaml $rolloutCfg.canary.steps) . | nindent 8 }}
+    {{- end }}
+  template:
+    {{- include "template.workloadPodSpec" . | nindent 4 }}
+{{- end }}

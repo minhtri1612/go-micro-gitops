@@ -1,0 +1,28 @@
+{{- range .Values.environments }}
+{{- $cluster := .cluster }}
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: {{ .name }}
+  namespace: argocd
+spec:
+  description: {{ .name }} environment project for Go Microservices
+  sourceRepos:
+{{- range $.Values.sourceRepos }}
+  - {{ . | quote }}
+{{- end }}
+  destinations:
+{{- range .namespaces }}
+  - name: {{ $cluster }}
+    namespace: {{ . }}
+  - server: {{ $.Values.defaultServer | default "https://kubernetes.default.svc" }}
+    namespace: {{ . }}
+{{- end }}
+  - server: {{ $.Values.defaultServer | default "https://kubernetes.default.svc" }}
+    namespace: argocd
+  clusterResourceWhitelist:
+{{- toYaml .clusterResourceWhitelist | nindent 4 }}
+  namespaceResourceWhitelist:
+{{- toYaml .namespaceResourceWhitelist | nindent 4 }}
+---
+{{- end }}

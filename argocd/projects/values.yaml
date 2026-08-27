@@ -1,0 +1,67 @@
+# ArgoCD Projects Configuration
+defaultServer: "https://kubernetes.default.svc"
+
+sourceRepos:
+  - "https://github.com/minhtri1612/go-micro.git"
+  - "*"
+
+environments:
+  - name: dev
+    cluster: dev
+    namespaces:
+      - microservices-dev
+      - databases-dev
+      - monitoring
+      - metallb-system
+      - argo-rollouts
+      - kube-system
+      - cilium-secrets
+      - traefik
+    clusterResourceWhitelist:
+      - group: ""
+        kind: Namespace
+      - group: "*"
+        kind: "*"
+    namespaceResourceWhitelist:
+      - group: "*"
+        kind: "*"
+
+  - name: staging
+    cluster: staging
+    namespaces:
+      - microservices-staging
+      - databases-staging
+      - monitoring
+      - metallb-system
+      - argo-rollouts
+      - kube-system
+      - cilium-secrets
+      - traefik
+    clusterResourceWhitelist:
+      - group: ""
+        kind: Namespace
+      - group: "*"
+        kind: "*"
+    namespaceResourceWhitelist:
+      - group: "*"
+        kind: "*"
+
+  - name: prod
+    cluster: prod
+    namespaces:
+      - microservices-prod
+      - databases-prod
+      - monitoring
+      - metallb-system
+      - argo-rollouts
+      - kube-system
+      - cilium-secrets
+      - traefik
+    clusterResourceWhitelist:
+      - group: ""
+        kind: Namespace
+      - group: "*"
+        kind: "*"
+    namespaceResourceWhitelist:
+      - group: "*"
+        kind: "*"

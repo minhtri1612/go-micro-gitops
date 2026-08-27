@@ -1,0 +1,35 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: dev-microservices
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: dev
+  source:
+    repoURL: https://github.com/minhtri1612/go-micro.git
+    targetRevision: main
+    path: argocd/manifest-apps
+    helm:
+      valueFiles:
+        - ../../env/dev.yaml
+      parameters:
+        - name: env
+          value: dev
+        - name: project
+          value: dev
+        - name: cluster
+          value: dev
+        - name: automated
+          value: "true"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

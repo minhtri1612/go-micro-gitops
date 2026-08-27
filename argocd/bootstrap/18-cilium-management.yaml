@@ -1,0 +1,100 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cilium-management
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  project: default
+  sources:
+    - repoURL: https://helm.cilium.io/
+      chart: cilium
+      targetRevision: 1.19.2
+      helm:
+        valueFiles:
+          - $values/cilium/cilium-values-management.yaml
+    - repoURL: https://github.com/minhtri1612/go-micro.git
+      targetRevision: main
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  ignoreDifferences:
+    - group: ""
+      kind: Secret
+      name: cilium-ca
+      namespace: kube-system
+      jsonPointers:
+        - /data
+        - /stringData
+      jqPathExpressions:
+        - .data
+        - .stringData
+    - group: ""
+      kind: Secret
+      name: hubble-server-certs
+      namespace: kube-system
+      jsonPointers:
+        - /data
+        - /stringData
+      jqPathExpressions:
+        - .data
+        - .stringData
+    - group: ""
+      kind: Secret
+      name: hubble-relay-client-certs
+      namespace: kube-system
+      jsonPointers:
+        - /data
+        - /stringData
+      jqPathExpressions:
+        - .data
+        - .stringData
+    - group: ""
+      kind: Secret
+      name: clustermesh-apiserver-admin-cert
+      namespace: kube-system
+      jsonPointers:
+        - /data
+        - /stringData
+      jqPathExpressions:
+        - .data
+        - .stringData
+    - group: ""
+      kind: Secret
+      name: clustermesh-apiserver-local-cert
+      namespace: kube-system
+      jsonPointers:
+        - /data
+        - /stringData
+      jqPathExpressions:
+        - .data
+        - .stringData
+    - group: ""
+      kind: Secret
+      name: clustermesh-apiserver-remote-cert
+      namespace: kube-system
+      jsonPointers:
+        - /data
+        - /stringData
+      jqPathExpressions:
+        - .data
+        - .stringData
+    - group: ""
+      kind: Secret
+      name: clustermesh-apiserver-server-cert
+      namespace: kube-system
+      jsonPointers:
+        - /data
+        - /stringData
+      jqPathExpressions:
+        - .data
+        - .stringData
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=false
+      - ServerSideApply=true

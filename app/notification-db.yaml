@@ -1,0 +1,59 @@
+# Notification Database - Override values for template/values.yaml
+replicaCount: 1
+workloadKind: statefulset
+
+image:
+  repository: postgres
+  pullPolicy: IfNotPresent
+  tag: "15-alpine"
+
+service:
+  type: ClusterIP
+  port: 5432
+  targetPort: 5432
+
+ingress:
+  enabled: false
+
+resources:
+  limits:
+    cpu: 300m
+    memory: 512Mi
+  requests:
+    cpu: 50m
+    memory: 128Mi
+
+containerEnv:
+  - name: POSTGRES_USER
+    value: postgres
+  - name: POSTGRES_PASSWORD
+    value: canh177
+  - name: POSTGRES_DB
+    value: notification_db
+
+# Database specific probes (TCP instead of HTTP)
+livenessProbe:
+  httpGet: null
+  tcpSocket:
+    port: 5432
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet: null
+  tcpSocket:
+    port: 5432
+  initialDelaySeconds: 5
+  periodSeconds: 5
+
+autoscaling:
+  enabled: false
+
+# Database needs persistent storage
+volumes:
+  - name: postgres-storage
+    emptyDir: {}
+
+volumeMounts:
+  - name: postgres-storage
+    mountPath: /var/lib/postgresql/data

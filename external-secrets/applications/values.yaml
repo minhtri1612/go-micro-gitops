@@ -1,0 +1,10 @@
+# Default values for external-secrets chart.
+# Use with:
+#   -f external-secrets/applications/values.yaml
+#   -f config/base/config.yaml
+#   -f config/env/<env>.yaml
+
+projectName: go-micro
+region: ap-southeast-2
+secretStoreName: aws-secrets-manager
+env: dev

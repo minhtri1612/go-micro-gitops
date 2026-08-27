@@ -1,0 +1,74 @@
+# Notification Service - Override values for template/values.yaml
+replicaCount: 1
+
+image:
+  repository: minhtri1612/go-microservice
+  pullPolicy: Always
+  tag: ""
+
+service:
+  type: ClusterIP
+  port: 8083
+  targetPort: 8083
+
+ingress:
+  enabled: false
+
+resources:
+  limits:
+    cpu: 300m
+    memory: 256Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+livenessProbe:
+  httpGet: null
+  tcpSocket:
+    port: 8083
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet: null
+  tcpSocket:
+    port: 8083
+  initialDelaySeconds: 10
+  periodSeconds: 5
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "8083"
+  prometheus.io/path: "/metrics"
+
+podMonitor:
+  enabled: true
+
+useExternalSecrets: true
+workloadKind: rollout
+
+routing:
+  provider: traefik
+
+traefik:
+  enabled: true
+  pathPrefix: /api/v1/notifications
+  stripPrefixes:
+    - /api/v1/notifications
+  ingressRouteForServices:
+    - noti
+
+rollout:
+  enabled: true
+  revisionHistoryLimit: 3
+
+ciliumNetworkPolicy:
+  enabled: false
+  services:
+    - noti

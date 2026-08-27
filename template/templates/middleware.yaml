@@ -1,0 +1,59 @@
+{{- $cs := .Values.currentService | default "" }}
+{{- $f := .Values.traefik.ingressRouteForServices | default list }}
+{{- $allow := or (eq (len $f) 0) (has $cs $f) }}
+{{- if and .Values.traefik.enabled (eq (.Values.routing.provider | default "traefik" | lower) "traefik") (ne (.Values.workloadKind | default "deployment" | lower) "statefulset") $allow }}
+{{- $fullName := include "template.fullname" . }}
+{{- $cur := .Values.currentService | default "" }}
+{{- $svc := (index .Values $cur) | default dict }}
+{{- $rolloutCfg := deepCopy (.Values.rollout | default dict) }}
+{{- if hasKey $svc "rollout" }}
+{{- $rolloutCfg = mergeOverwrite $rolloutCfg ($svc.rollout | default dict) }}
+{{- end }}
+{{- $rolloutEnabled := $rolloutCfg.enabled | default false }}
+{{- $strategy := $rolloutCfg.strategy | default "canary" | lower }}
+{{- $stripPrefixes := .Values.traefik.stripPrefixes | default list }}
+
+{{- if gt (len $stripPrefixes) 0 }}
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ $fullName }}-strip-api
+  labels:
+    {{- include "template.labels" . | nindent 4 }}
+spec:
+  stripPrefix:
+    prefixes:
+      {{- toYaml $stripPrefixes | nindent 6 }}
+{{- end }}
+
+{{- if $rolloutEnabled }}
+{{- if and (eq $strategy "canary") (.Values.traefik.darkLaunch | default false) }}
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ $fullName }}-canary-id
+  labels:
+    {{- include "template.labels" . | nindent 4 }}
+spec:
+  headers:
+    customResponseHeaders:
+      X-Served-By: "canary"
+{{- end }}
+
+{{- if eq $strategy "bluegreen" }}
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ $fullName }}-preview-id
+  labels:
+    {{- include "template.labels" . | nindent 4 }}
+spec:
+  headers:
+    customResponseHeaders:
+      X-Served-By: "preview"
+{{- end }}
+{{- end }}
+{{- end }}

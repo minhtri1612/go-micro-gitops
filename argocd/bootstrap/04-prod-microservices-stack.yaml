@@ -1,0 +1,38 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prod-microservices
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: prod
+  source:
+    repoURL: https://github.com/minhtri1612/go-micro.git
+    targetRevision: main
+    path: argocd/manifest-apps
+    helm:
+      valueFiles:
+        - ../../env/prod.yaml
+      parameters:
+        - name: env
+          value: prod
+        - name: project
+          value: prod
+        - name: cluster
+          value: prod
+        - name: automated
+          value: "false"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    retry:
+      limit: 3
+      backoff:
+        duration: 30s
+        maxDuration: 5m
+        factor: 2
+    syncOptions:
+      - CreateNamespace=true

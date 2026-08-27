@@ -1,0 +1,92 @@
+# Frontend Client - Override values for template/values.yaml
+replicaCount: 2
+
+image:
+  repository: minhtri1612/go-microservice
+  pullPolicy: Always
+  tag: ""
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 80
+
+ingress:
+  enabled: false
+  className: "traefik"
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: "default-cors@kubernetescrd"
+  hosts:
+    - host: app.local
+      paths:
+        - path: /
+          pathType: Prefix
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: 80
+  initialDelaySeconds: 10
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: 80
+  initialDelaySeconds: 5
+  periodSeconds: 5
+
+client:
+  configs:
+    filesMountPath: /etc/nginx/conf.d
+    files:
+      - name: default.conf
+        value: |
+          server {
+              listen 80;
+              server_name localhost;
+              root /usr/share/nginx/html;
+              index index.html;
+
+
+              location / {
+                  try_files $uri $uri/ /index.html;
+              }
+          }
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+
+podMonitor:
+  enabled: true
+
+useExternalSecrets: true
+workloadKind: rollout
+
+routing:
+  provider: traefik
+
+traefik:
+  enabled: true
+  ingressRouteForServices:
+    - client
+
+rollout:
+  enabled: true
+  revisionHistoryLimit: 3
+
+ciliumNetworkPolicy:
+  enabled: false
+  services:
+    - client

@@ -1,0 +1,98 @@
+env: prod
+projectName: go-micro
+
+routing:
+  provider: traefik
+
+traefik:
+  enabled: true
+  hostname: go-micro.local
+  stableWeight: 99
+  canaryWeight: 1
+  darkLaunch: true
+
+ciliumNetworkPolicy:
+  enabled: false
+  authenticationMode: ""
+
+rollout:
+  enabled: true
+  strategy: canary
+  analysis:
+    enabled: false
+    prometheusAddress: http://172.18.255.45
+    load:
+      vus: 12
+      duration: 60s
+      errorRate: 0.02
+    thresholds:
+      latencyP95: 5.0
+      latencyCount: 10
+      latencyFailureLimit: 3
+      successRate: 0.95
+      successCount: 10
+      successInitialDelay: 60s
+      successFailureLimit: 1
+  canary:
+    steps:
+      - setWeight: 1
+      - pause:
+          duration: 5m
+      - setWeight: 20
+      - pause:
+          duration: 5m
+      - setWeight: 50
+      - pause:
+          duration: 5m
+      - setWeight: 80
+      - pause:
+          duration: 5m
+      - setWeight: 100
+
+product:
+  namespace: microservices-prod
+  secrets:
+    target:
+      name: go-micro-product-secrets
+    remoteKey: go-micro/prod/app-credentials
+
+inventory:
+  namespace: microservices-prod
+  secrets:
+    target:
+      name: go-micro-inventory-secrets
+    remoteKey: go-micro/prod/app-credentials
+
+order:
+  namespace: microservices-prod
+  secrets:
+    target:
+      name: go-micro-order-secrets
+    remoteKey: go-micro/prod/app-credentials
+
+noti:
+  namespace: microservices-prod
+  secrets:
+    target:
+      name: go-micro-noti-secrets
+    remoteKey: go-micro/prod/app-credentials
+
+payment:
+  namespace: microservices-prod
+  secrets:
+    target:
+      name: go-micro-payment-secrets
+    remoteKey: go-micro/prod/app-credentials
+
+client:
+  rollout:
+    analysis:
+      thresholds:
+        # Frontend client uses different telemetry than gin-based backend services.
+        successRate: 0
+        successFailureLimit: 1
+
+podMonitor:
+  enabled: true
+  interval: 15s
+  release: monitoring-management

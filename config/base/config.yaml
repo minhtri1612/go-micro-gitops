@@ -1,0 +1,171 @@
+projectName: go-micro
+secretStoreName: aws-secrets-manager
+region: ap-southeast-2
+
+product:
+  namespace: microservices
+  syncWave: "-2"
+  secrets:
+    refreshInterval: 1h
+    data:
+      - secretKey: DB_USER
+        remoteRef:
+          property: DB_USER
+      - secretKey: DB_PASSWORD
+        remoteRef:
+          property: DB_PASSWORD
+      - secretKey: DB_NAME
+        remoteRef:
+          property: PRODUCT_DB_NAME
+
+inventory:
+  namespace: microservices
+  syncWave: "-2"
+  secrets:
+    refreshInterval: 1h
+    data:
+      - secretKey: DB_USER
+        remoteRef:
+          property: DB_USER
+      - secretKey: DB_PASSWORD
+        remoteRef:
+          property: DB_PASSWORD
+      - secretKey: DB_NAME
+        remoteRef:
+          property: INVENTORY_DB_NAME
+
+order:
+  namespace: microservices
+  syncWave: "-2"
+  secrets:
+    refreshInterval: 1h
+    data:
+      - secretKey: DB_USER
+        remoteRef:
+          property: DB_USER
+      - secretKey: DB_PASSWORD
+        remoteRef:
+          property: DB_PASSWORD
+      - secretKey: DB_NAME
+        remoteRef:
+          property: ORDER_DB_NAME
+
+noti:
+  namespace: microservices
+  syncWave: "-2"
+  secrets:
+    refreshInterval: 1h
+    data:
+      - secretKey: DB_USER
+        remoteRef:
+          property: DB_USER
+      - secretKey: DB_PASSWORD
+        remoteRef:
+          property: DB_PASSWORD
+      - secretKey: DB_NAME
+        remoteRef:
+          property: NOTIFICATION_DB_NAME
+
+payment:
+  namespace: microservices
+  syncWave: "-2"
+  secrets:
+    refreshInterval: 1h
+    data:
+      - secretKey: DB_USER
+        remoteRef:
+          property: DB_USER
+      - secretKey: DB_PASSWORD
+        remoteRef:
+          property: DB_PASSWORD
+      - secretKey: DB_NAME
+        remoteRef:
+          property: PAYMENT_DB_NAME
+      - secretKey: STRIPE_SECRET_KEY
+        remoteRef:
+          property: STRIPE_SECRET_KEY
+
+rollout:
+  enabled: true
+  strategy: canary
+  analysis:
+    enabled: false
+    prometheusAddress: http://172.18.255.45
+    load:
+      vus: 10
+      duration: 30s
+      errorRate: 0.1
+    thresholds:
+      latencyP95: 0.5
+      latencyCount: 3
+      latencyFailureLimit: 0
+      successRate: 0.82
+      successCount: 5
+      successInitialDelay: 45s
+      successFailureLimit: 3
+    templates:
+      - name: latency-check
+        args:
+          - name: service-name
+        metrics:
+          - name: latency-p95-check
+            interval: 15s
+            count: '{{ .Values.rollout.analysis.thresholds.latencyCount | default 3 }}'
+            initialDelay: 70s
+            failureLimit: '{{ .Values.rollout.analysis.thresholds.latencyFailureLimit | default 0 }}'
+            successCondition: 'result[0] == 999 || result[0] < {{ .Values.rollout.analysis.thresholds.latencyP95 | default 0.5 }}'
+            provider:
+              prometheus:
+                address: '{{ .Values.rollout.analysis.prometheusAddress | default "http://172.18.255.45" }}'
+                query: |
+                  (
+                    histogram_quantile(0.95, sum(increase(gin_request_duration_bucket{pod=~'{{ `{{` }}args.service-name{{ `}}` }}-.*'}[5m])) by (le))
+                    unless
+                    sum(increase(gin_request_duration_count{pod=~'{{ `{{` }}args.service-name{{ `}}` }}-.*'}[5m])) < 1
+                  ) or vector(999)
+      - name: success-rate
+        args:
+          - name: service-name
+        metrics:
+          - name: success-rate
+            interval: 30s
+            count: 5
+            initialDelay: '45s'
+            failureLimit: 3
+            successCondition: 'result[0] >= {{ .Values.rollout.analysis.thresholds.successRate | default 0.82 }}'
+            failureCondition: 'result[0] < {{ .Values.rollout.analysis.thresholds.successRate | default 0.82 }}'
+            provider:
+              prometheus:
+                address: '{{ .Values.rollout.analysis.prometheusAddress | default "http://172.18.255.45" }}'
+                query: |
+                  {{- if eq (toString .Values.currentService) "client" }}
+                  vector(1)
+                  {{- else }}
+                  (
+                    (
+                      sum(increase(gin_request_total{pod=~"{{ "{{" }}args.service-name{{ "}}" }}-.*"}[5m])) > 0
+                    )
+                    *
+                    (
+                      1 - (
+                        (sum(increase(gin_request_total{pod=~"{{ "{{" }}args.service-name{{ "}}" }}-.*",code=~"5.."}[5m])) or vector(0))
+                        /
+                        clamp_min(sum(increase(gin_request_total{pod=~"{{ "{{" }}args.service-name{{ "}}" }}-.*"}[5m])), 1)
+                      )
+                    )
+                  ) or vector(0)
+                  {{- end }}
+  canary:
+    steps:
+      - setWeight: 1
+      - pause:
+          duration: 1m
+      - setWeight: 20
+      - setWeight: 50
+      - setWeight: 80
+      - setWeight: 100
+  blueGreen:
+    activeService: ""
+    previewService: ""
+    autoPromotionEnabled: true
+    scaleDownDelaySeconds: 30

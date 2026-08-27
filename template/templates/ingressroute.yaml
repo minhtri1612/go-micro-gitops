@@ -1,0 +1,97 @@
+{{- $cs := .Values.currentService | default "" }}
+{{- $f := .Values.traefik.ingressRouteForServices | default list }}
+{{- $allow := or (eq (len $f) 0) (has $cs $f) }}
+{{- if and .Values.traefik.enabled (eq (.Values.routing.provider | default "traefik" | lower) "traefik") (ne (.Values.workloadKind | default "deployment" | lower) "statefulset") $allow }}
+{{- $fullName := include "template.fullname" . }}
+{{- $svcPort := .Values.service.port }}
+{{- $cur := .Values.currentService | default "" }}
+{{- $svc := (index .Values $cur) | default dict }}
+{{- $rolloutCfg := deepCopy (.Values.rollout | default dict) }}
+{{- if hasKey $svc "rollout" }}
+{{- $rolloutCfg = mergeOverwrite $rolloutCfg ($svc.rollout | default dict) }}
+{{- end }}
+{{- $rolloutEnabled := $rolloutCfg.enabled | default false }}
+{{- $strategy := $rolloutCfg.strategy | default "canary" | lower }}
+{{- $canarySvc := $rolloutCfg.canary.canaryService | default (printf "%s-canary" $fullName) }}
+{{- $activeSvc := $rolloutCfg.blueGreen.activeService | default $fullName }}
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "template.labels" . | nindent 4 }}
+spec:
+  entryPoints:
+    {{- toYaml .Values.traefik.entryPoints | nindent 4 }}
+  routes:
+    - match: Host(`{{ .Values.traefik.hostname }}`) && PathPrefix(`{{ .Values.traefik.pathPrefix | default "/" }}`)
+      kind: Rule
+{{- $stripPrefixes := .Values.traefik.stripPrefixes | default list }}
+{{- if gt (len $stripPrefixes) 0 }}
+      middlewares:
+        - name: {{ $fullName }}-strip-api
+{{- end }}
+      services:
+{{- if and $rolloutEnabled (eq $strategy "bluegreen") }}
+        - name: {{ $activeSvc }}
+          port: {{ $svcPort }}
+{{- else }}
+        - name: {{ $fullName }}-weighted
+          kind: TraefikService
+{{- end }}
+{{- if and $rolloutEnabled (eq $strategy "bluegreen") }}
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ $fullName }}-preview
+  labels:
+    {{- include "template.labels" . | nindent 4 }}
+spec:
+  entryPoints:
+    {{- toYaml .Values.traefik.entryPoints | nindent 4 }}
+  routes:
+    - match: Host(`{{ .Values.traefik.hostname }}`) && PathPrefix(`{{ .Values.traefik.pathPrefix | default "/" }}`) && HeaderRegexp(`X-Preview`, `true`)
+      kind: Rule
+      priority: 100
+      middlewares:
+{{- $stripPrefixes := .Values.traefik.stripPrefixes | default list }}
+{{- if gt (len $stripPrefixes) 0 }}
+        - name: {{ $fullName }}-strip-api
+{{- end }}
+        - name: {{ $fullName }}-preview-id
+      services:
+        - name: {{ $rolloutCfg.blueGreen.previewService | default (printf "%s-preview" $fullName) }}
+          port: {{ $svcPort }}
+{{- end }}
+{{- if and $rolloutEnabled (eq $strategy "canary") (.Values.traefik.darkLaunch | default false) }}
+---
+# Dark Launch: request có header X-Canary: true → đi thẳng vào canary pod
+# Dùng để QA/Dev test canary trước khi mở traffic thật
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ $fullName }}-dark
+  labels:
+    {{- include "template.labels" . | nindent 4 }}
+  annotations:
+    # Header: X-Canary: true
+    usage: "dark-launch-qa-only"
+spec:
+  entryPoints:
+    {{- toYaml .Values.traefik.entryPoints | nindent 4 }}
+  routes:
+    - match: Host(`{{ .Values.traefik.hostname }}`) && PathPrefix(`{{ .Values.traefik.pathPrefix | default "/" }}`) && HeaderRegexp(`X-Canary`, `true`)
+      kind: Rule
+      priority: 100
+      middlewares:
+{{- $stripPrefixes := .Values.traefik.stripPrefixes | default list }}
+{{- if gt (len $stripPrefixes) 0 }}
+        - name: {{ $fullName }}-strip-api
+{{- end }}
+        - name: {{ $fullName }}-canary-id
+      services:
+        - name: {{ $canarySvc }}
+          port: {{ $svcPort }}
+{{- end }}
+{{- end }}

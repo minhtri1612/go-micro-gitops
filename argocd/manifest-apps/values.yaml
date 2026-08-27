@@ -1,0 +1,63 @@
+# Manifest Apps Configuration
+repoURL: "https://github.com/minhtri1612/go-micro.git"
+name: "go-microservices"
+
+# Services configuration with profiles and namespaces
+appsByEnv:
+  # Backend Services
+
+  product:
+    profile: "product"
+    namespace: "microservices"
+    syncWave: "2"
+  
+  inventory:
+    profile: "inventory"
+    namespace: "microservices"
+    syncWave: "2"
+  
+  order:
+    profile: "order"
+    namespace: "microservices"
+    syncWave: "3"
+  
+  payment:
+    profile: "payment"
+    namespace: "microservices"
+    syncWave: "3"
+  
+  noti:
+    profile: "noti"
+    namespace: "microservices"
+    syncWave: "3"
+  
+  client:
+    profile: "client"
+    namespace: "microservices"
+    syncWave: "3"
+  
+  # Database Services (deploy first)
+  product-db:
+    profile: "product-db"
+    namespace: "databases"
+    syncWave: "1"
+  
+  inventory-db:
+    profile: "inventory-db"
+    namespace: "databases"
+    syncWave: "1"
+  
+  order-db:
+    profile: "order-db"
+    namespace: "databases"
+    syncWave: "1"
+  
+  payment-db:
+    profile: "payment-db"
+    namespace: "databases"
+    syncWave: "1"
+  
+  notification-db:
+    profile: "notification-db"
+    namespace: "databases"
+    syncWave: "1"

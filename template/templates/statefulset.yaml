@@ -1,0 +1,32 @@
+{{- if eq (.Values.workloadKind | default "deployment" | lower) "statefulset" }}
+{{- $p := .Values.persistence | default dict }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "template.fullname" . }}
+  labels:
+    {{- include "template.labels" . | nindent 4 }}
+spec:
+  {{- /* serviceName is immutable; legacy chart used fullname (main Service), not *-hl */}}
+  serviceName: {{ include "template.fullname" . }}
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "template.selectorLabels" . | nindent 6 }}
+  template:
+    {{- include "template.workloadPodSpec" . | nindent 4 }}
+  {{- if ($p.enabled | default false) }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        {{- with $p.storageClassName }}
+        storageClassName: {{ . | quote }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ $p.size | default "10Gi" | quote }}
+  {{- end }}
+{{- end }}
