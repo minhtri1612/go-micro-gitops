@@ -12,7 +12,7 @@ spec:
       helm:
         valueFiles:
           - $values/argocd/argo-rollouts-values.yaml
-    - repoURL: https://github.com/minhtri1612/go-micro.git
+    - repoURL: https://github.com/minhtri1612/go-micro-infra.git
       targetRevision: main
       ref: values
   destination:

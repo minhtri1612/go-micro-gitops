@@ -13,10 +13,10 @@ spec:
         releaseName: metallb
         valueFiles:
           - $values/config/metallb/metallb-common.yaml
-    - repoURL: https://github.com/minhtri1612/go-micro.git
+    - repoURL: https://github.com/minhtri1612/go-micro-infra.git
       targetRevision: main
       ref: values
-    - repoURL: https://github.com/minhtri1612/go-micro.git
+    - repoURL: https://github.com/minhtri1612/go-micro-infra.git
       path: config/metallb/pools/prod
       targetRevision: main
   destination:

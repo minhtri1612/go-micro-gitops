@@ -15,10 +15,10 @@ spec:
         valueFiles:
           - $values/monitoring/monitoring-workload.yaml
           - $values/monitoring/monitoring-workload-labels-prod.yaml
-    - repoURL: https://github.com/minhtri1612/go-micro.git
+    - repoURL: https://github.com/minhtri1612/go-micro-infra.git
       targetRevision: main
       ref: values
-    - repoURL: https://github.com/minhtri1612/go-micro.git
+    - repoURL: https://github.com/minhtri1612/go-micro-infra.git
       targetRevision: main
       path: monitoring
       directory:

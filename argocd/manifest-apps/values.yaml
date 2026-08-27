@@ -1,5 +1,5 @@
 # Manifest Apps Configuration
-repoURL: "https://github.com/minhtri1612/go-micro.git"
+repoURL: "https://github.com/minhtri1612/go-micro-gitops.git"
 name: "go-microservices"
 
 # Services configuration with profiles and namespaces

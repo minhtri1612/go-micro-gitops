@@ -9,7 +9,7 @@ metadata:
 spec:
   project: staging
   source:
-    repoURL: https://github.com/minhtri1612/go-micro.git
+    repoURL: https://github.com/minhtri1612/go-micro-gitops.git
     targetRevision: main
     path: argocd/manifest-apps
     helm:

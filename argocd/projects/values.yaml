@@ -2,7 +2,8 @@
 defaultServer: "https://kubernetes.default.svc"
 
 sourceRepos:
-  - "https://github.com/minhtri1612/go-micro.git"
+  - "https://github.com/minhtri1612/go-micro-gitops.git"
+  - "https://github.com/minhtri1612/go-micro-infra.git"
   - "*"
 
 environments:

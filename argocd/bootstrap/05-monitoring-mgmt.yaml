@@ -14,15 +14,15 @@ spec:
       helm:
         valueFiles:
           - $values/monitoring/monitoring-mgmt.yaml
-    - repoURL: https://github.com/minhtri1612/go-micro.git
+    - repoURL: https://github.com/minhtri1612/go-micro-infra.git
       targetRevision: main
       ref: values
-    - repoURL: https://github.com/minhtri1612/go-micro.git
+    - repoURL: https://github.com/minhtri1612/go-micro-infra.git
       targetRevision: main
       path: monitoring
       directory:
         include: 'prometheus-global-management.yaml'
-    - repoURL: https://github.com/minhtri1612/go-micro.git
+    - repoURL: https://github.com/minhtri1612/go-micro-infra.git
       targetRevision: main
       path: monitoring
       directory:

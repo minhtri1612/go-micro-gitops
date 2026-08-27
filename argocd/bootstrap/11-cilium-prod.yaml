@@ -16,7 +16,7 @@ spec:
           - $values/cilium/cilium-values.yaml
           - $values/cilium/cilium-cluster-prod.yaml
           - $values/cilium/clustermesh-management-peer.yaml
-    - repoURL: https://github.com/minhtri1612/go-micro.git
+    - repoURL: https://github.com/minhtri1612/go-micro-infra.git
       targetRevision: main
       ref: values
   destination:
