@@ -90,7 +90,7 @@ rollout:
   strategy: canary
   analysis:
     enabled: false
-    prometheusAddress: http://172.18.255.45
+    prometheusAddress: ""
     load:
       vus: 10
       duration: 30s
@@ -116,7 +116,7 @@ rollout:
             successCondition: 'result[0] == 999 || result[0] < {{ .Values.rollout.analysis.thresholds.latencyP95 | default 0.5 }}'
             provider:
               prometheus:
-                address: '{{ .Values.rollout.analysis.prometheusAddress | default "http://172.18.255.45" }}'
+                address: '{{ .Values.rollout.analysis.prometheusAddress | default "" }}'
                 query: |
                   (
                     histogram_quantile(0.95, sum(increase(gin_request_duration_bucket{pod=~'{{ `{{` }}args.service-name{{ `}}` }}-.*'}[5m])) by (le))
@@ -136,7 +136,7 @@ rollout:
             failureCondition: 'result[0] < {{ .Values.rollout.analysis.thresholds.successRate | default 0.82 }}'
             provider:
               prometheus:
-                address: '{{ .Values.rollout.analysis.prometheusAddress | default "http://172.18.255.45" }}'
+                address: '{{ .Values.rollout.analysis.prometheusAddress | default "" }}'
                 query: |
                   {{- if eq (toString .Values.currentService) "client" }}
                   vector(1)

@@ -61,10 +61,6 @@ spec:
       kind: StatefulSet
       jsonPointers:
         - /spec/replicas
-    - group: cilium.io
-      kind: CiliumNetworkPolicy
-      jqPathExpressions:
-        - .status
     - group: traefik.io
       kind: IngressRoute
       jqPathExpressions:

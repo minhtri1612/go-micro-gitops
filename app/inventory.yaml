@@ -67,8 +67,3 @@ traefik:
 rollout:
   enabled: true
   revisionHistoryLimit: 3
-
-ciliumNetworkPolicy:
-  enabled: false
-  services:
-    - inventory

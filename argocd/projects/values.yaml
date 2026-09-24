@@ -13,10 +13,7 @@ environments:
       - microservices-dev
       - databases-dev
       - monitoring
-      - metallb-system
       - argo-rollouts
-      - kube-system
-      - cilium-secrets
       - traefik
     clusterResourceWhitelist:
       - group: ""
@@ -33,10 +30,7 @@ environments:
       - microservices-staging
       - databases-staging
       - monitoring
-      - metallb-system
       - argo-rollouts
-      - kube-system
-      - cilium-secrets
       - traefik
     clusterResourceWhitelist:
       - group: ""
@@ -53,10 +47,7 @@ environments:
       - microservices-prod
       - databases-prod
       - monitoring
-      - metallb-system
       - argo-rollouts
-      - kube-system
-      - cilium-secrets
       - traefik
     clusterResourceWhitelist:
       - group: ""

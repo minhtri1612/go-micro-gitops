@@ -134,21 +134,6 @@ rollout:
     # (override per env in config/env/*.yaml or app/be.yaml)
     prometheusAddress: ""
 
-ciliumNetworkPolicy:
-  enabled: false
-  authenticationMode: ""
-  # When empty, policy applies to any workload. Otherwise only listed currentService values.
-  services: []
-  ingress:
-    fromEndpoints: []
-    http: []
-  egress:
-    toEndpoints: []
-    toEntities: []
-    port: ""
-    protocol: TCP
-    http: []
-
 podMonitor:
   enabled: false
   metricsPath: /metrics

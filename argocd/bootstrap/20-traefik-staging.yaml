@@ -23,7 +23,7 @@ spec:
           enabled: true
           isDefaultClass: true
         service:
-          type: LoadBalancer
+          type: NodePort
   destination:
     name: staging
     namespace: traefik
