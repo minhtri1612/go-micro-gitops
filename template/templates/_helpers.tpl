@@ -71,7 +71,8 @@ Image repository / tag for this release (values come from merged app/*.yaml).
 {{- end }}
 
 {{/*
-Root key in Values for ESO secret blocks (product-db -> product, notification-db -> noti).
+Root key in Values for ESO secret blocks on app pods (product-db -> product, notification-db -> noti).
+Database pods use currentService (product-db, notification-db) so POSTGRES_* secrets apply.
 */}}
 {{- define "template.esoRootName" -}}
 {{- $cs := .Values.currentService | default "" -}}
@@ -106,9 +107,16 @@ Pod template (metadata + spec) shared by Deployment, Rollout, and StatefulSet.
 {{- $rootCfg = index .Values $root | default dict }}
 {{- end }}
 {{- $isDatabasePod := hasSuffix "-db" $cs }}
+{{- $secretCfgKey := $cs }}
+{{- if not $isDatabasePod }}
+{{- $secretCfgKey = $root }}
+{{- end }}
+{{- if $secretCfgKey }}
+{{- $rootCfg = index .Values $secretCfgKey | default dict }}
+{{- end }}
 {{- $hasDbSecret := false }}
 {{- $secretName := "" }}
-{{- if and (not $isDatabasePod) $rootCfg (hasKey $rootCfg "secrets") (hasKey $rootCfg.secrets "target") (hasKey $rootCfg.secrets.target "name") }}
+{{- if and $rootCfg (hasKey $rootCfg "secrets") (hasKey $rootCfg.secrets "target") (hasKey $rootCfg.secrets.target "name") }}
 {{- $hasDbSecret = true }}
 {{- $secretName = $rootCfg.secrets.target.name }}
 {{- end }}

@@ -85,6 +85,86 @@ payment:
         remoteRef:
           property: STRIPE_SECRET_KEY
 
+product-db:
+  namespace: databases
+  syncWave: "-2"
+  secrets:
+    refreshInterval: 1h
+    data:
+      - secretKey: POSTGRES_USER
+        remoteRef:
+          property: POSTGRES_USER
+      - secretKey: POSTGRES_PASSWORD
+        remoteRef:
+          property: POSTGRES_PASSWORD
+      - secretKey: POSTGRES_DB
+        remoteRef:
+          property: PRODUCT_DB_NAME
+
+inventory-db:
+  namespace: databases
+  syncWave: "-2"
+  secrets:
+    refreshInterval: 1h
+    data:
+      - secretKey: POSTGRES_USER
+        remoteRef:
+          property: POSTGRES_USER
+      - secretKey: POSTGRES_PASSWORD
+        remoteRef:
+          property: POSTGRES_PASSWORD
+      - secretKey: POSTGRES_DB
+        remoteRef:
+          property: INVENTORY_DB_NAME
+
+order-db:
+  namespace: databases
+  syncWave: "-2"
+  secrets:
+    refreshInterval: 1h
+    data:
+      - secretKey: POSTGRES_USER
+        remoteRef:
+          property: POSTGRES_USER
+      - secretKey: POSTGRES_PASSWORD
+        remoteRef:
+          property: POSTGRES_PASSWORD
+      - secretKey: POSTGRES_DB
+        remoteRef:
+          property: ORDER_DB_NAME
+
+payment-db:
+  namespace: databases
+  syncWave: "-2"
+  secrets:
+    refreshInterval: 1h
+    data:
+      - secretKey: POSTGRES_USER
+        remoteRef:
+          property: POSTGRES_USER
+      - secretKey: POSTGRES_PASSWORD
+        remoteRef:
+          property: POSTGRES_PASSWORD
+      - secretKey: POSTGRES_DB
+        remoteRef:
+          property: PAYMENT_DB_NAME
+
+notification-db:
+  namespace: databases
+  syncWave: "-2"
+  secrets:
+    refreshInterval: 1h
+    data:
+      - secretKey: POSTGRES_USER
+        remoteRef:
+          property: POSTGRES_USER
+      - secretKey: POSTGRES_PASSWORD
+        remoteRef:
+          property: POSTGRES_PASSWORD
+      - secretKey: POSTGRES_DB
+        remoteRef:
+          property: NOTIFICATION_DB_NAME
+
 rollout:
   enabled: true
   strategy: canary

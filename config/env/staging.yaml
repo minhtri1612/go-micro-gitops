@@ -77,6 +77,41 @@ payment:
       name: go-micro-payment-secrets-staging
     remoteKey: go-micro/staging/app-credentials
 
+product-db:
+  namespace: databases-staging
+  secrets:
+    target:
+      name: go-micro-product-db-secrets-staging
+    remoteKey: go-micro/staging/app-credentials
+
+inventory-db:
+  namespace: databases-staging
+  secrets:
+    target:
+      name: go-micro-inventory-db-secrets-staging
+    remoteKey: go-micro/staging/app-credentials
+
+order-db:
+  namespace: databases-staging
+  secrets:
+    target:
+      name: go-micro-order-db-secrets-staging
+    remoteKey: go-micro/staging/app-credentials
+
+payment-db:
+  namespace: databases-staging
+  secrets:
+    target:
+      name: go-micro-payment-db-secrets-staging
+    remoteKey: go-micro/staging/app-credentials
+
+notification-db:
+  namespace: databases-staging
+  secrets:
+    target:
+      name: go-micro-notification-db-secrets-staging
+    remoteKey: go-micro/staging/app-credentials
+
 client:
   rollout:
     analysis:

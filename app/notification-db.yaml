@@ -23,14 +23,6 @@ resources:
     cpu: 50m
     memory: 128Mi
 
-containerEnv:
-  - name: POSTGRES_USER
-    value: postgres
-  - name: POSTGRES_PASSWORD
-    value: canh177
-  - name: POSTGRES_DB
-    value: notification_db
-
 # Database specific probes (TCP instead of HTTP)
 livenessProbe:
   httpGet: null

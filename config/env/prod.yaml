@@ -80,6 +80,41 @@ payment:
       name: go-micro-payment-secrets
     remoteKey: go-micro/prod/app-credentials
 
+product-db:
+  namespace: databases-prod
+  secrets:
+    target:
+      name: go-micro-product-db-secrets
+    remoteKey: go-micro/prod/app-credentials
+
+inventory-db:
+  namespace: databases-prod
+  secrets:
+    target:
+      name: go-micro-inventory-db-secrets
+    remoteKey: go-micro/prod/app-credentials
+
+order-db:
+  namespace: databases-prod
+  secrets:
+    target:
+      name: go-micro-order-db-secrets
+    remoteKey: go-micro/prod/app-credentials
+
+payment-db:
+  namespace: databases-prod
+  secrets:
+    target:
+      name: go-micro-payment-db-secrets
+    remoteKey: go-micro/prod/app-credentials
+
+notification-db:
+  namespace: databases-prod
+  secrets:
+    target:
+      name: go-micro-notification-db-secrets
+    remoteKey: go-micro/prod/app-credentials
+
 client:
   rollout:
     analysis:
