@@ -16,11 +16,13 @@ Source of truth for **Argo CD** app desired state (multi-repo layout).
 
 ## Bootstrap
 
-Apply from this repo (after Kind + Argo up):
+Apply from this repo (after Kind + Argo up). **Skip Cilium/MetalLB** (`09`–`11`, `15`–`18` cilium/metallb). CNI = kindnet.
 
 ```bash
 kubectl apply -f argocd/bootstrap/00-argocd-cm-health.yaml
-# … then 01, 02, …
+kubectl apply -f argocd/bootstrap/01-projects.yaml
+# monitoring 05/06/08, then rollouts 12/14, traefik 19/21, stacks 02/04
+# do not apply 09/11/18-cilium or 15/17/18-metallb
 ```
 
 Platform Applications pull Helm **values** from `go-micro-infra`; microservice apps from this repo.
