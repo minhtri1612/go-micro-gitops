@@ -1,11 +1,15 @@
 env: prod
 
+# Kind 1 node: one replica per service. HPA off so it cannot scale back up.
+autoscaling:
+  enabled: false
+
 # Service-specific overrides
 
 product:
   image:
     tag: "product-service-v1.0.3"
-  replicaCount: 3
+  replicaCount: 1
   rollout:
     enabled: true
     strategy: canary
@@ -13,7 +17,7 @@ product:
 inventory:
   image:
     tag: "inventory-service-v1.0.3"
-  replicaCount: 3
+  replicaCount: 1
   rollout:
     enabled: true
     strategy: canary
@@ -21,7 +25,7 @@ inventory:
 order:
   image:
     tag: "order-service-v1.0.3"
-  replicaCount: 5
+  replicaCount: 1
   rollout:
     enabled: true
     strategy: canary
@@ -29,7 +33,7 @@ order:
 payment:
   image:
     tag: "payment-service-v1.0.3"
-  replicaCount: 5
+  replicaCount: 1
   rollout:
     enabled: true
     strategy: canary
@@ -37,7 +41,7 @@ payment:
 noti:
   image:
     tag: "notification-service-v1.0.3"
-  replicaCount: 3
+  replicaCount: 1
   rollout:
     enabled: true
     strategy: canary
@@ -45,7 +49,7 @@ noti:
 client:
   image:
     tag: "client-v1.0.3"
-  replicaCount: 3
+  replicaCount: 1
   rollout:
     enabled: true
     strategy: canary
