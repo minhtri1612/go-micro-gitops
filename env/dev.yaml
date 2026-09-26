@@ -40,7 +40,7 @@ payment:
 
 noti:
   image:
-    tag: "notification-service-v1.0.2"
+    tag: "notification-service-9d0751d"
   replicaCount: 1
   rollout:
     enabled: true
