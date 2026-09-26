@@ -32,7 +32,7 @@ order:
 
 payment:
   image:
-    tag: "payment-service-v1.0.3"
+    tag: "payment-service-9f78c82"
   replicaCount: 1
   rollout:
     enabled: true
