@@ -2,7 +2,7 @@
 replicaCount: 1
 
 image:
-  repository: minhtri1612/go-microservice
+  repository: minhtri1612/inventory-service
   pullPolicy: Always
   tag: ""
 
