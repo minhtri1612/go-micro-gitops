@@ -20,7 +20,7 @@ resources:
     cpu: 1000m
     memory: 2Gi
   requests:
-    cpu: 200m
+    cpu: 50m
     memory: 512Mi
 
 # Database specific probes (TCP instead of HTTP)
