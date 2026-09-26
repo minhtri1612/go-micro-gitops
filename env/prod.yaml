@@ -1,8 +1,8 @@
 env: prod
 
-# Kind 1 node: one replica per service. HPA off so it cannot scale back up.
+# Kind 1 node: start at one replica. HPA stays on; minReplicas 1 so client.yaml min=2 does not pin two pods.
 autoscaling:
-  enabled: false
+  minReplicas: 1
 
 # Service-specific overrides
 
