@@ -24,7 +24,7 @@ inventory:
 
 order:
   image:
-    tag: "order-service-0663a77"
+    tag: "order-service-a345189"
   replicaCount: 1
   rollout:
     enabled: true
