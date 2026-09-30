@@ -1,0 +1,43 @@
+name: protect-prod-manifests
+
+on:
+  pull_request:
+    paths:
+      - env/prod.yaml
+      - config/env/prod.yaml
+
+jobs:
+  protect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Allow prod yaml only from Jenkins promote branches
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_URL: ${{ github.event.pull_request.url }}
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          set -euo pipefail
+          files="$(curl -sS -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" \
+            "${PR_URL}/files" | jq -r '.[].filename')"
+          echo "Changed files:"
+          echo "${files}"
+
+          if echo "${files}" | grep -qx 'env/prod.yaml'; then
+            if [[ "${HEAD_REF}" != ci/promote-* ]]; then
+              echo "env/prod.yaml chỉ được đổi trên branch ci/promote-* (Jenkins TARGET_ENV=prod → PR)."
+              exit 1
+            fi
+            extra="$(echo "${files}" | grep -v -x 'env/prod.yaml' || true)"
+            if [[ -n "${extra}" ]]; then
+              echo "Promote PR chỉ được đụng env/prod.yaml. Thừa:"
+              echo "${extra}"
+              exit 1
+            fi
+          fi
+
+          if echo "${files}" | grep -qx 'config/env/prod.yaml'; then
+            if echo "${files}" | grep -qx 'env/prod.yaml'; then
+              echo "Đừng gộp config/env/prod.yaml với promote tag."
+              exit 1
+            fi
+          fi
