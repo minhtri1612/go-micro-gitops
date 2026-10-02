@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ebs-csi-prod
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: prod
+  sources:
+    - repoURL: https://kubernetes-sigs.github.io/aws-ebs-csi-driver
+      chart: aws-ebs-csi-driver
+      targetRevision: 2.35.1
+      helm:
+        releaseName: aws-ebs-csi-driver
+        valueFiles:
+          - $values/storage/ebs-csi-prod.yaml
+    - repoURL: https://github.com/minhtri1612/go-micro-infra.git
+      targetRevision: main
+      ref: values
+  destination:
+    name: prod
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

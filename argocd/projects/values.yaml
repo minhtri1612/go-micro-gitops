@@ -15,6 +15,7 @@ environments:
       - monitoring
       - argo-rollouts
       - traefik
+      - kube-system
     clusterResourceWhitelist:
       - group: ""
         kind: Namespace
@@ -32,6 +33,7 @@ environments:
       - monitoring
       - argo-rollouts
       - traefik
+      - kube-system
     clusterResourceWhitelist:
       - group: ""
         kind: Namespace
@@ -49,6 +51,7 @@ environments:
       - monitoring
       - argo-rollouts
       - traefik
+      - kube-system
     clusterResourceWhitelist:
       - group: ""
         kind: Namespace

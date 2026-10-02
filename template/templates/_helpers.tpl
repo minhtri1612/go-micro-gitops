@@ -139,7 +139,9 @@ Pod template (metadata + spec) shared by Deployment, Rollout, and StatefulSet.
 {{- $extraEnv := .Values.extraEnv | default list }}
 {{- $hasExtraEnv := and (kindIs "slice" $extraEnv) (gt (len $extraEnv) 0) }}
 {{- $containerEnvFrom := .Values.containerEnvFrom | default list }}
-{{- $hasContainerEnvFrom := and (kindIs "slice" $containerEnvFrom) (gt (len $containerEnvFrom) 0) -}}
+{{- $hasContainerEnvFrom := and (kindIs "slice" $containerEnvFrom) (gt (len $containerEnvFrom) 0) }}
+{{- $persist := .Values.persistence | default dict }}
+{{- $persistOn := $persist.enabled | default false -}}
 metadata:
   {{- with .Values.podAnnotations }}
   annotations:
@@ -209,8 +211,12 @@ spec:
         {{- toYaml $containerEnvFrom | nindent 8 }}
         {{- end }}
       {{- end }}
-      {{- if or .Values.volumeMounts (and .Values.runtimeConfig.enabled .Values.runtimeConfig.data) $hasCfgFiles }}
+      {{- if or $persistOn .Values.volumeMounts (and .Values.runtimeConfig.enabled .Values.runtimeConfig.data) $hasCfgFiles }}
       volumeMounts:
+        {{- if $persistOn }}
+        - name: {{ $persist.volumeName | default "data" }}
+          mountPath: {{ $persist.mountPath | default "/var/lib/postgresql/data" }}
+        {{- end }}
         {{- with .Values.volumeMounts }}
         {{- toYaml . | nindent 8 }}
         {{- end }}

@@ -18,7 +18,7 @@ spec:
   {{- if ($p.enabled | default false) }}
   volumeClaimTemplates:
     - metadata:
-        name: data
+        name: {{ $p.volumeName | default "data" }}
       spec:
         accessModes:
           - ReadWriteOnce

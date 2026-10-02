@@ -151,7 +151,10 @@ useExternalSecrets: true
 
 persistence:
   enabled: false
+  storageClassName: gp3
   size: 10Gi
+  volumeName: data
+  mountPath: /var/lib/postgresql/data
 
 env: ""
 

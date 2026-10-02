@@ -41,11 +41,11 @@ readinessProbe:
 autoscaling:
   enabled: false
 
-# Database needs persistent storage
-volumes:
-  - name: postgres-storage
-    emptyDir: {}
+persistence:
+  enabled: true
+  storageClassName: gp3
+  size: 10Gi
 
-volumeMounts:
-  - name: postgres-storage
-    mountPath: /var/lib/postgresql/data
+extraEnv:
+  - name: PGDATA
+    value: /var/lib/postgresql/data/pgdata
