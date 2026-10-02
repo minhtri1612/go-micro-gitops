@@ -60,7 +60,7 @@ traefik:
   enabled: true
   pathPrefix: /api/v1/payments
   stripPrefixes:
-    - /api/v1/payments
+    - /api/v1
   ingressRouteForServices:
     - payment
 

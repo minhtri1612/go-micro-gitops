@@ -60,7 +60,7 @@ traefik:
   enabled: true
   pathPrefix: /api/v1/inventory
   stripPrefixes:
-    - /api/v1/inventory
+    - /api/v1
   ingressRouteForServices:
     - inventory
 

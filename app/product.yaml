@@ -60,7 +60,7 @@ traefik:
   enabled: true
   pathPrefix: /api/v1/products
   stripPrefixes:
-    - /api/v1/products
+    - /api/v1
   ingressRouteForServices:
     - product
 
