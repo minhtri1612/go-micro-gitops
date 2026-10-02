@@ -133,8 +133,8 @@ Service repos (`go-micro-product`, …) chỉ còn Jenkinsfile một dòng sau �
 
 ## Không làm trong plan này
 
-- EKS / IRSA (ESO lab Kind + IAM key vẫn tách).  
-- Đổi Argo/Kind topology.  
+- EKS / IRSA (ESO lab + IAM key vẫn tách).  
+- Đổi Argo/RKE2 topology.  
 - Mỗi dev một Jenkins.
 
 ---

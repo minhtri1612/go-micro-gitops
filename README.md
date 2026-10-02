@@ -12,11 +12,11 @@ Source of truth for **Argo CD** app desired state (multi-repo layout).
 ## Not here
 
 - Jenkins — **không** ở repo này. CI = Docker Compose trong `go-micro-infra/jenkins` + library `go-micro-pipeline-lib`
-- Kind/Terraform — **`go-micro-infra`**
+- Terraform — **`go-micro-infra`**
 
 ## Bootstrap
 
-Apply from this repo after Kind + Argo are up. CNI = kindnet. Traefik = NodePort. No Cilium, no MetalLB.
+Apply from this repo after RKE2 + Argo are up. CNI = Canal. Traefik = NodePort 32080/32443. No Cilium, no MetalLB.
 
 ```bash
 kubectl apply -f argocd/bootstrap/00-argocd-cm-health.yaml
