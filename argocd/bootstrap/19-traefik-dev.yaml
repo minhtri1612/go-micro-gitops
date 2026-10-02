@@ -24,6 +24,11 @@ spec:
           isDefaultClass: true
         service:
           type: NodePort
+        ports:
+          web:
+            nodePort: 32080
+          websecure:
+            nodePort: 32443
   destination:
     name: dev
     namespace: traefik

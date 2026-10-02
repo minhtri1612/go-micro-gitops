@@ -6,7 +6,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "0"
 spec:
-  project: dest
+  project: dev
   sources:
     - repoURL: https://kubernetes-sigs.github.io/aws-ebs-csi-driver
       chart: aws-ebs-csi-driver
@@ -19,7 +19,7 @@ spec:
       targetRevision: main
       ref: values
   destination:
-    name: dest
+    name: dev
     namespace: kube-system
   syncPolicy:
     automated:
