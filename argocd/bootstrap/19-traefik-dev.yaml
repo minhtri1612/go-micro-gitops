@@ -24,6 +24,15 @@ spec:
           isDefaultClass: true
         service:
           type: NodePort
+        metrics:
+          prometheus:
+            enabled: true
+            addEntryPointsLabels: true
+            addServicesLabels: true
+            service:
+              enabled: true
+            serviceMonitor:
+              enabled: true
         ports:
           web:
             nodePort: 32080
