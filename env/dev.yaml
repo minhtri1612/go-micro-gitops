@@ -8,7 +8,7 @@ autoscaling:
 
 product:
   image:
-    tag: "product-service-666496c"
+    tag: "product-service-3bddf8c"
   replicaCount: 1
   rollout:
     enabled: true
