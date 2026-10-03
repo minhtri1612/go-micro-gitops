@@ -48,7 +48,7 @@ noti:
 
 client:
   image:
-    tag: "client-bee1b79"
+    tag: "client-4c6d7e9"
   replicaCount: 1
   rollout:
     enabled: true
