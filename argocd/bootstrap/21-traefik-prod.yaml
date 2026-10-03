@@ -33,7 +33,13 @@ spec:
               enabled: true
             serviceMonitor:
               enabled: true
+              additionalLabels:
+                release: monitoring-prod
         ports:
+          metrics:
+            port: 9100
+            expose:
+              default: true
           web:
             nodePort: 32080
           websecure:

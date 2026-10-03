@@ -23,6 +23,11 @@ spec:
       path: monitoring
       directory:
         include: "prometheus-global-workload.yaml"
+    - repoURL: https://github.com/minhtri1612/go-micro-infra.git
+      targetRevision: main
+      path: monitoring
+      directory:
+        include: "traefik-podmonitor-dev.yaml"
   destination:
     name: dev
     namespace: monitoring
