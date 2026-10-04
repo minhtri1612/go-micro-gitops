@@ -3,7 +3,6 @@ name: protect-prod-manifests
 on:
   pull_request:
     paths:
-      - env/prod.yaml
       - env/prod/**
       - config/env/prod.yaml
 
@@ -24,7 +23,7 @@ jobs:
           echo "Changed files:"
           echo "${rows}"
 
-          tag_re='^(env/prod\.yaml|env/prod/(product|inventory|order|payment|noti|client)\.yaml)$'
+          tag_re='^env/prod/(product|inventory|order|payment|noti|client)\.yaml$'
           added_tags="$(echo "${rows}" | awk -F'\t' -v re="${tag_re}" '$1=="added" && $2 ~ re {print $2}')"
           changed_tags="$(echo "${rows}" | awk -F'\t' -v re="${tag_re}" '$1!="added" && $2 ~ re {print $2}')"
           all_files="$(echo "${rows}" | cut -f2)"
