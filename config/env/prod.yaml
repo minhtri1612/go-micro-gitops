@@ -30,19 +30,20 @@ rollout:
       successInitialDelay: 60s
       successFailureLimit: 1
   canary:
+    # Một pause: {} duy nhất (sau 20%) = chờ Jenkins gate + promote. Các bước sau dùng pause có duration
+    # để vẫn chạy lần lượt 50→80→100 mà không cần bấm promote thêm.
     steps:
       - setWeight: 1
       - pause:
-          duration: 5m
+          duration: 30s
       - setWeight: 20
-      - pause:
-          duration: 5m
+      - pause: {}
       - setWeight: 50
       - pause:
-          duration: 5m
+          duration: 30s
       - setWeight: 80
       - pause:
-          duration: 5m
+          duration: 30s
       - setWeight: 100
 
 product:
