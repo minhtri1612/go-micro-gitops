@@ -21,7 +21,8 @@ spec:
       releaseName: {{ $appName }}
       valueFiles:
         - ../app/{{ $appConfig.profile }}.yaml
-        - ../env/{{ $.Values.env }}.yaml
+        - ../env/{{ $.Values.env }}/_shared.yaml
+        - ../env/{{ $.Values.env }}/{{ $appName }}.yaml
         - ../config/base/config.yaml
         - ../config/env/{{ $.Values.env }}.yaml
       parameters:

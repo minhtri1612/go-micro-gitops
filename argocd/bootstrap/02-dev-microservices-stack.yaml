@@ -14,7 +14,7 @@ spec:
     path: argocd/manifest-apps
     helm:
       valueFiles:
-        - ../../env/dev.yaml
+        - ../../env/dev/_shared.yaml
       parameters:
         - name: env
           value: dev
