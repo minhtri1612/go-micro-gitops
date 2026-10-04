@@ -1,0 +1,4 @@
+order-db:
+  image:
+    tag: "15-alpine"
+  replicaCount: 1
