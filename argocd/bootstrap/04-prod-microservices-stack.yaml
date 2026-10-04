@@ -23,11 +23,14 @@ spec:
         - name: cluster
           value: prod
         - name: automated
-          value: "false"
+          value: "true"
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
   syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
     retry:
       limit: 3
       backoff:
