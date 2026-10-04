@@ -11,40 +11,51 @@ jobs:
   protect:
     runs-on: ubuntu-latest
     steps:
-      - name: Allow prod yaml only from Jenkins promote branches
+      - name: Allow prod tag edits only from Jenkins promote branches
         env:
           GH_TOKEN: ${{ github.token }}
           PR_URL: ${{ github.event.pull_request.url }}
           HEAD_REF: ${{ github.head_ref }}
         run: |
           set -euo pipefail
-          files="$(curl -sS -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" \
-            "${PR_URL}/files" | jq -r '.[].filename')"
+          payload="$(curl -sS -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" \
+            "${PR_URL}/files?per_page=100")"
+          rows="$(echo "${payload}" | jq -r '.[] | "\(.status)\t\(.filename)"')"
           echo "Changed files:"
-          echo "${files}"
+          echo "${rows}"
 
-          prod_tag_files="$(echo "${files}" | grep -E '^(env/prod\.yaml|env/prod/[^_/][^/]*\.yaml)$' || true)"
-          if [[ -n "${prod_tag_files}" ]]; then
+          tag_re='^(env/prod\.yaml|env/prod/(product|inventory|order|payment|noti|client)\.yaml)$'
+          added_tags="$(echo "${rows}" | awk -F'\t' -v re="${tag_re}" '$1=="added" && $2 ~ re {print $2}')"
+          changed_tags="$(echo "${rows}" | awk -F'\t' -v re="${tag_re}" '$1!="added" && $2 ~ re {print $2}')"
+          all_files="$(echo "${rows}" | cut -f2)"
+
+          if [[ -n "${added_tags}" ]]; then
+            echo "New prod tag files allowed (bootstrap / new service):"
+            echo "${added_tags}"
+          fi
+
+          if [[ -n "${changed_tags}" ]]; then
             if [[ "${HEAD_REF}" != ci/promote-* ]]; then
-              echo "env/prod tag files chỉ được đổi trên branch ci/promote-* (Jenkins TARGET_ENV=prod → PR)."
+              echo "Sửa tag prod chỉ trên branch ci/promote-* (Jenkins TARGET_ENV=prod → PR)."
+              echo "${changed_tags}"
               exit 1
             fi
-            extra="$(echo "${files}" | grep -v -E '^(env/prod\.yaml|env/prod/[^_/][^/]*\.yaml)$' || true)"
+            extra="$(echo "${all_files}" | grep -v -E "${tag_re}" || true)"
             if [[ -n "${extra}" ]]; then
               echo "Promote PR chỉ được đụng file tag prod. Thừa:"
               echo "${extra}"
               exit 1
             fi
-            count="$(echo "${prod_tag_files}" | grep -c .)"
+            count="$(echo "${changed_tags}" | grep -c .)"
             if [[ "${count}" -ne 1 ]]; then
               echo "Promote PR chỉ được đụng đúng 1 file tag prod."
-              echo "${prod_tag_files}"
+              echo "${changed_tags}"
               exit 1
             fi
           fi
 
-          if echo "${files}" | grep -qx 'config/env/prod.yaml'; then
-            if [[ -n "${prod_tag_files}" ]]; then
+          if echo "${all_files}" | grep -qx 'config/env/prod.yaml'; then
+            if [[ -n "${changed_tags}" ]]; then
               echo "Đừng gộp config/env/prod.yaml với promote tag."
               exit 1
             fi
