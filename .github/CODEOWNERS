@@ -1,4 +1,5 @@
-# Prod manifests. DevOps owns merge. Dest CI must not land these without a promote PR.
+# DevOps owns merge. dev CI must not land these without a promote PR.
 /env/prod.yaml @minhtri1612
 /env/prod/ @minhtri1612
 /config/env/prod.yaml @minhtri1612
+/env/staging/ @minhtri1612

@@ -2,10 +2,6 @@ name: protect-prod-manifests
 
 on:
   pull_request:
-    paths:
-      - env/prod.yaml
-      - env/prod/**
-      - config/env/prod.yaml
 
 jobs:
   protect:
