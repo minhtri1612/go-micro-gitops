@@ -1,6 +1,6 @@
 product:
   image:
-    tag: "product-service-1525975"
+    tag: "product-service-2e0679e"
   replicaCount: 1
   rollout:
     enabled: true
