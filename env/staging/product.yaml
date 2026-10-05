@@ -1,7 +1,0 @@
-product:
-  image:
-    tag: "product-service-v1.0.2"
-  replicaCount: 2
-  rollout:
-    enabled: true
-    strategy: canary

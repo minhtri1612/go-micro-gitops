@@ -1,7 +1,0 @@
-inventory:
-  image:
-    tag: "inventory-service-v1.0.1"
-  replicaCount: 2
-  rollout:
-    enabled: true
-    strategy: canary
